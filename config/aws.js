@@ -9,9 +9,9 @@ const s3 = new AWS.S3({
   region: process.env.AWS_REGION,
 });
 
-async function uploadToS3(file, bucketName) {
+async function uploadToS3(file) {
   const params = {
-    Bucket: bucketName,
+    Bucket: process.env.AWS_BUCKET_NAME,
     Key: uuidv4() + "-" + file.originalname,
     Body: file.buffer,
     ACL: "public-read",

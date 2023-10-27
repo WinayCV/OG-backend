@@ -8,7 +8,7 @@ const authenticateUser = async (req, res, next) => {
   token = token.split(" ")[1];
   try {
     const tokenData = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = _.pick(tokenData, ["id"]);
+    req.user = _.pick(tokenData, ["id", "role"]);
     next();
   } catch (error) {
     res.status(500).json({ error });

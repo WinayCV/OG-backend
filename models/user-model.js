@@ -14,8 +14,8 @@ const userSchmea = new Schema(
     },
     role: {
       type: String,
-      // enum: ["admin", "artist", "user"],
-      // default: "user",
+      enum: ["admin", "artist", "user"],
+      default: "user",
     },
     myBids: {
       type: [Schema.Types.ObjectId],

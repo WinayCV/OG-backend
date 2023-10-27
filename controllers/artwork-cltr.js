@@ -47,7 +47,7 @@ artworkCltr.create = async (req, res) => {
     const filesData = await Promise.all(watermarkImages);
     // uplaoding to AWS
     for (const file of filesData) {
-      const uploadResult = await uploadToS3(file, process.env.AWS_BUCKET_NAME);
+      const uploadResult = await uploadToS3(file);
       images.push(uploadResult);
     }
 
@@ -59,4 +59,21 @@ artworkCltr.create = async (req, res) => {
   }
 };
 
+artworkCltr.all = async (req, res) => {
+  try {
+    const artwork = await Artwork.find({ status: "active" });
+    res.json(artwork);
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+};
+artworkCltr.list = async (req, res) => {
+  const id = req.user.id;
+  try {
+    const artwork = await Artwork.find({ artist: id });
+    res.json(artwork);
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+};
 module.exports = artworkCltr;

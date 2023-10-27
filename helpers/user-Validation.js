@@ -80,4 +80,12 @@ const userLoginSchema = {
   password: passowrdSchmea,
 };
 
-module.exports = { userRegisterationSchema, userLoginSchema };
+const userAdminSchema = {
+  role: {
+    notEmpty: {
+      errorMessage: "role cannot be empty",
+    },
+  },
+};
+
+module.exports = { userRegisterationSchema, userLoginSchema, userAdminSchema };

@@ -56,11 +56,10 @@ userCltr.register = async (req, res) => {
       to: `${user.email}`, // list of receivers
       subject: "Verification Email", // Subject line
       text: "Hello! Welcome to our website.", // plain text body
-      html: `<a href='http://localhost:5050/api/verifyEmail/${token}'>Click here to verify your email.</a>`,
+      html: `<a href='http://localhost:5050/og/verifyEmail/${token}'>Click here to verify your email.</a>`,
     });
     res.json({
       msg: "Registraction Sucessful, to activate your account please check your mail and click on verification link.",
-      user,
     });
   } catch (error) {
     res.status(500).json({ error });
@@ -69,9 +68,14 @@ userCltr.register = async (req, res) => {
 
 userCltr.verify = async (req, res) => {
   const token = req.params.token;
+  let id;
   try {
     const tokenData = jwt.verify(token, process.env.JWT_SECRET);
-    const id = tokenData.id;
+    id = tokenData.id;
+  } catch (error) {
+    res.status(400).send("Sorry verification failed");
+  }
+  try {
     const user = await User.findByIdAndUpdate(id, { isVerified: true });
     res.json("verification confirmed");
   } catch (error) {
@@ -95,7 +99,11 @@ userCltr.login = async (req, res) => {
     if (!user.isVerified) {
       return res
         .status(400)
-        .json({ errors: [{ msg: "Please verify email before login" }] });
+        .json({
+          errors: [
+            { msg: "Email not verified,please verify email before login" },
+          ],
+        });
     }
     const result = bcrypt.compare(body.password, user.password);
     if (!result) {
@@ -103,7 +111,7 @@ userCltr.login = async (req, res) => {
         .status(400)
         .json({ errors: [{ msg: "invalid email or password" }] });
     }
-    const tokenData = { id: user._id };
+    const tokenData = { id: user._id, role: user.role };
     const token = jwt.sign(tokenData, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
@@ -123,4 +131,18 @@ userCltr.account = async (req, res) => {
   }
 };
 
+userCltr.role = async (req, res) => {
+  const id = req.params.id;
+  const body = _.pick(req.body, ["role"]);
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const user = await User.findByIdAndUpdate(id, { role: body.role });
+    res.json({ msg: "role updated" });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+};
 module.exports = userCltr;
