@@ -30,5 +30,25 @@ const artworkValidationSchema = {
     },
   },
 };
-
-module.exports = artworkValidationSchema;
+const artworkEditSchema = {
+  title: {
+    notEmpty: {
+      errorMessage: "title cannot be empty",
+    },
+  },
+  description: {
+    notEmpty: {
+      errorMessage: "description cannot be empty",
+    },
+  },
+  searchTag: {
+    notEmpty: {
+      errorMessage: "Please add search tags ",
+    },
+    isArray: {
+      options: { min: 2 },
+      errorMessage: "Minimum 2 search tags are required",
+    },
+  },
+};
+module.exports = { artworkValidationSchema, artworkEditSchema };

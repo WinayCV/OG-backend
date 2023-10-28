@@ -9,10 +9,10 @@ const s3 = new AWS.S3({
   region: process.env.AWS_REGION,
 });
 
-async function uploadToS3(file) {
+async function uploadToS3(file, userId) {
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME,
-    Key: uuidv4() + "-" + file.originalname,
+    Key: `${userId}/${uuidv4()}-${file.originalname}`,
     Body: file.buffer,
     ACL: "public-read",
   };
@@ -20,5 +20,20 @@ async function uploadToS3(file) {
   const data = await s3.upload(params).promise();
   return { url: data.Location, key: data.Key };
 }
+//for deleting image i have to pass the key
+async function deleteFromS3(key) {
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: key,
+  };
 
-module.exports = { uploadToS3 };
+  try {
+    await s3.deleteObject(params).promise();
+    console.log("image deleted");
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+module.exports = { uploadToS3, deleteFromS3 };

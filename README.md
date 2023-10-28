@@ -76,8 +76,10 @@ myBids:[{artworkId}]
 // Add fields for authentication tokens, timestamps, etc.
 }
 
-Profile: {
-
+address: {
+\_id:
+user:userid
+name:String
 }
 
 Artwork {
@@ -123,21 +125,20 @@ content: String,
 timestamp: Date,
 isRead: Boolean,
 }
-
+// add address modle
 Order {
 \_id: ObjectId,
 buyer: ObjectId (reference to User),
 artwork: ObjectId (reference to Artwork),
+address:addressId
 amount: Number,
 status: String (completed, pending),
 timestamp: Date,
 }
 Comments {
 \_id: ObjectId,
-commenter: ObjectId (reference to User),
-commentTo: ObjectId (reference to User),
-commentArtwork: ObjectId (reference to Artwork),
-star: Number,
+user: ObjectId (reference to User),
+Artwork: ObjectId (reference to Artwork),
 description: String,
 timestamp: Date,
 }

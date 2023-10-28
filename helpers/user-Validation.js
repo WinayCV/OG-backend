@@ -7,16 +7,6 @@ const usernameRegisterSchmea = {
     option: { min: 4 },
     errorMessage: "username should be minimum 4 charecter",
   },
-  custom: {
-    options: async (value) => {
-      const user = await User.findOne({ username: value });
-      if (user) {
-        throw new Error(" username already in use.");
-      } else {
-        return true;
-      }
-    },
-  },
 };
 
 const emailRegisterSchema = {
@@ -80,6 +70,28 @@ const userLoginSchema = {
   password: passowrdSchmea,
 };
 
+const userProfileEditSchmea = {
+  firstName: usernameRegisterSchmea,
+  mobileNum: mobileSchema,
+  email: {
+    notEmpty: {
+      errorMessage: "Email cannot be empty",
+    },
+    isEmail: {
+      errorMessage: "Invalid email",
+    },
+    custom: {
+      options: async (value, { req }) => {
+        const user = await User.findOne({ email: value });
+        if (user && user._id == req.user.id) {
+          return true;
+        } else {
+          throw new Error("Email already exist");
+        }
+      },
+    },
+  },
+};
 const userAdminSchema = {
   role: {
     notEmpty: {
@@ -88,4 +100,9 @@ const userAdminSchema = {
   },
 };
 
-module.exports = { userRegisterationSchema, userLoginSchema, userAdminSchema };
+module.exports = {
+  userRegisterationSchema,
+  userLoginSchema,
+  userAdminSchema,
+  userProfileEditSchmea,
+};

@@ -97,13 +97,11 @@ userCltr.login = async (req, res) => {
         .json({ errors: [{ msg: "invalid email or password" }] });
     }
     if (!user.isVerified) {
-      return res
-        .status(400)
-        .json({
-          errors: [
-            { msg: "Email not verified,please verify email before login" },
-          ],
-        });
+      return res.status(400).json({
+        errors: [
+          { msg: "Email not verified,please verify email before login" },
+        ],
+      });
     }
     const result = bcrypt.compare(body.password, user.password);
     if (!result) {
@@ -141,6 +139,28 @@ userCltr.role = async (req, res) => {
     }
     const user = await User.findByIdAndUpdate(id, { role: body.role });
     res.json({ msg: "role updated" });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+};
+userCltr.edit = async (req, res) => {
+  const id = req.user.id;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  const body = _.pick(req.body, [
+    "firstName",
+    "lastName",
+    "email",
+    "mobileNum",
+  ]);
+  try {
+    const user = await User.findByIdAndUpdate(id, body, {
+      new: true,
+      runValidators: true,
+    });
+    res.json(user);
   } catch (error) {
     res.status(500).json({ error });
   }

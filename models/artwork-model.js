@@ -4,7 +4,7 @@ const { Schema, model } = mongoose;
 const artworkSchema = new Schema({
   title: String,
   description: String,
-  images: [Object],
+  images: [{ url: String, key: String }],
   artist: {
     type: Schema.Types.ObjectId,
     ref: "User",

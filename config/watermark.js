@@ -9,7 +9,6 @@ async function addWatermark(files) {
     baseImage.print(font, 50, 10, "Online Gallery");
     const width = Jimp.AUTO; // Let Jimp automatically adjust the width
     const height = baseImage.getHeight(); // Specify the desired height
-
     srcImage.resize(width, height).invert();
     // Calculate the center coordinates for the srcImage
     const x = (baseImage.getWidth() - srcImage.getWidth()) / 4;
