@@ -94,7 +94,7 @@ status: String (active, sold),
 
 Auction {
 \_id: ObjectId,
-user: ObjectId (reference to User),
+artist: ObjectId (reference to User),
 artwork: ObjectId (reference to Artwork),
 isLive: boolean,(Live or regular bidding)
 startingBid: Number,

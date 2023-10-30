@@ -116,12 +116,7 @@ artworkCltr.edit = async (req, res) => {
   const id = req.params.id;
   const files = req.files;
   const userId = req.user.id;
-  const body = _.pick(req.body, [
-    "title",
-    "description",
-    "searchtag",
-    "deleteImages",
-  ]);
+  const body = _.pick(req.body, ["title", "description", "deleteImages"]);
   let images = [];
   try {
     //converting delete images id into an array if only one id is sent
@@ -150,7 +145,7 @@ artworkCltr.edit = async (req, res) => {
       });
       //array of objects of images to be deleted [{url,key,_id}]
       const resolvedImages = await Promise.all(oldImages);
-      //deleting the images from aws using key
+      //deleting the images from aws
       if (resolvedImages) {
         for (const file of resolvedImages) {
           const result = await deleteFromS3(file.key);

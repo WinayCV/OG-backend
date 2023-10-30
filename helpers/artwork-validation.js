@@ -41,14 +41,14 @@ const artworkEditSchema = {
       errorMessage: "description cannot be empty",
     },
   },
-  searchTag: {
-    notEmpty: {
-      errorMessage: "Please add search tags ",
-    },
-    isArray: {
-      options: { min: 2 },
-      errorMessage: "Minimum 2 search tags are required",
-    },
-  },
+  // searchTag: {
+  //   notEmpty: {
+  //     errorMessage: "Please add search tags ",
+  //   },
+  // isArray: {
+  //   options: { min: 2 },
+  //   errorMessage: "Minimum 2 search tags are required",
+  // },
+  // },
 };
 module.exports = { artworkValidationSchema, artworkEditSchema };
