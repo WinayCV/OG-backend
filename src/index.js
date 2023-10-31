@@ -20,6 +20,7 @@ const {
   artworkEditSchema,
 } = require("../helpers/artwork-validation");
 const multer = require("multer");
+const auctionCltr = require("../controllers/auctionCltr");
 const app = express();
 const port = process.env.PORT;
 
@@ -90,6 +91,13 @@ app.delete(
   artworkCltr.delete
 );
 
+//Auction
+app.post(
+  "/og/auction/:id",
+  authenticateUser,
+  authorizeUser(["artist"]),
+  auctionCltr.create
+);
 //Connection to server
 app.listen(port, () => {
   console.log("server running at ", port);

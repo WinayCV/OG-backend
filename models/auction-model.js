@@ -23,10 +23,12 @@ const auctionSchema = new Schema(
       ref: "Artwork",
     },
     isLive: { type: Boolean, default: false },
-    startingBid: Number,
-    currentBid: Number,
     auctionStart: Date,
     auctionEnd: Date,
+    auctionType: {
+      type: String,
+      enum: ["live", "regular"],
+    },
     bids: [bidSchema],
   },
   { timestamps: true }

@@ -15,6 +15,12 @@ const artworkSchema = new Schema({
     enum: ["active", "sold"],
     default: "active",
   },
+  currentBidAmount: { type: Number, default: 0 },
+  startingBidAmount: Number,
+  auction: {
+    type: Schema.Types.ObjectId,
+    ref: "Auction",
+  },
 });
 
 const Artwork = model("Artwork", artworkSchema);
