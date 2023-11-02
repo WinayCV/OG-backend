@@ -10,7 +10,6 @@ auctionCltr.create = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const artworkId = req.params.id;
   const body = _.pick(req.body, [
     "auctionEnd",
     "auctionStart",
@@ -20,12 +19,13 @@ auctionCltr.create = async (req, res) => {
   try {
     body.artist = req.user.id;
     const auction = new Auction(body);
-    const artwork = await Artwork.findOneAndUpdate(
-      { _id: artworkId },
-      { $set: { auction: auction._id } },
-      { new: true, runValidators: true }
-    );
-
+    auction.artworks.map(async (artworkId) => {
+      const artwork = await Artwork.findOneAndUpdate(
+        { _id: artworkId },
+        { $set: { auction: auction._id } },
+        { new: true, runValidators: true }
+      );
+    });
     await auction.save();
     res.json({ msg: "auction has been created", auction });
   } catch (error) {

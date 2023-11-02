@@ -94,18 +94,13 @@ app.delete(
 
 //Auction
 app.post(
-  "/og/auction/:id",
+  "/og/auction/create",
   authenticateUser,
   checkSchema(auctionValidationSchema),
   authorizeUser(["artist"]),
   auctionCltr.create
-); //for regular auction
-app.post(
-  "/og/auction/live",
-  authenticateUser,
-  checkSchema(auctionValidationSchema),
-  authenticateUser(["artist"])
 );
+
 app.delete(
   "/og/auction/delete/:id",
   authenticateUser,
