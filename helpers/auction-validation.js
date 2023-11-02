@@ -1,29 +1,28 @@
 const auctionValidationSchema = {
-  startingBid: {
-    isEmpty: {
-      errorMessage: "Enter starting bid",
-    },
-  },
-  currentBid: {
-    isEmpty: {
-      errorMessage: "Current starting bid",
-    },
-  },
+  // startingBid: {
+  //   notEmpty: {
+  //     errorMessage: "Enter starting bid",
+  //   },
+  // },
+  // currentBid: {
+  //   isEmpty: {
+  //     errorMessage: "Current starting bid",
+  //   },
+  // },
   auctionStart: {
-    isEmpty: {
+    notEmpty: {
       errorMessage: "need an auction start date to begin",
+      bail: true,
     },
-    isDate: {
-      errorMessage: "date should be valid",
-      format: "YYYY-MM-DD",
+
+    isISO8601: {
+      errorMessage: "Invalid Date and Time.",
+      bail: true,
     },
     custom: {
       options: (value) => {
-        const today = new Date();
-        const year = today.getFullYear(),
-          month = today.getMonth() + 1,
-          day = today.getDate();
-        if (new Date(value) < new Date(`${year}-${month}-${day}`)) {
+        console.log(new Date(value));
+        if (new Date(value) < new Date()) {
           throw new Error("start date cannot be less today");
         } else {
           return true;
@@ -32,16 +31,17 @@ const auctionValidationSchema = {
     },
   },
   auctionEnd: {
-    isEmpty: {
+    notEmpty: {
       errorMessage: "Auction end date cannot be empty",
+      bail: true,
     },
-    isDate: {
-      errorMessage: "date should be valid",
-      format: "YYYY-MM-DD",
+    isISO8601: {
+      errorMessage: "Invalid Date and Time.",
+      bail: true,
     },
     custom: {
       options: (value, { req }) => {
-        if (new Date(value) < new Date(req.body.auctionStart)) {
+        if (new Date(value) <= new Date(req.body.auctionStart)) {
           throw new Error(
             "Auction end date cannot be less than the auction start date"
           );
@@ -49,6 +49,12 @@ const auctionValidationSchema = {
           return true;
         }
       },
+    },
+  },
+  auctionType: {
+    notEmpty: {
+      errorMessage: "cannot be empty",
+      bail: true,
     },
   },
 };

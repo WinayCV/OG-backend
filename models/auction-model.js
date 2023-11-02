@@ -7,9 +7,13 @@ const bidSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    artwork: {
+      type: Schema.Types.ObjectId,
+      ref: "Artwork",
+    },
     amount: Number,
   },
-  { timestamps: ture }
+  { timestamps: true }
 );
 
 const auctionSchema = new Schema(
@@ -18,11 +22,7 @@ const auctionSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    artwork: {
-      type: Schema.Types.ObjectId,
-      ref: "Artwork",
-    },
-    isLive: { type: Boolean, default: false },
+    artworks: [{ type: Schema.Types.ObjectId, ref: "Artwork" }],
     auctionStart: Date,
     auctionEnd: Date,
     auctionType: {
