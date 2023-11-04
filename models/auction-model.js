@@ -1,20 +1,18 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const bidSchema = new Schema(
-  {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-    artwork: {
-      type: Schema.Types.ObjectId,
-      ref: "Artwork",
-    },
-    amount: Number,
+const bidSchema = new Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
   },
-  { timestamps: true }
-);
+  artwork: {
+    type: Schema.Types.ObjectId,
+    ref: "Artwork",
+  },
+  amount: Number,
+  createdAt: { type: Date, default: Date.now },
+});
 
 const auctionSchema = new Schema(
   {

@@ -21,7 +21,6 @@ const auctionValidationSchema = {
     },
     custom: {
       options: (value) => {
-        console.log(new Date(value));
         if (new Date(value) < new Date()) {
           throw new Error("start date cannot be less today");
         } else {
@@ -59,4 +58,11 @@ const auctionValidationSchema = {
   },
 };
 
-module.exports = auctionValidationSchema;
+const bidSchemaValidation = {
+  amount: {
+    notEmpty: {
+      errorMessage: "Amount cannot be empty",
+    },
+  },
+};
+module.exports = { auctionValidationSchema, bidSchemaValidation };

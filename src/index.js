@@ -21,7 +21,10 @@ const {
 } = require("../helpers/artwork-validation");
 const multer = require("multer");
 const auctionCltr = require("../controllers/auctionCltr");
-const auctionValidationSchema = require("../helpers/auction-validation");
+const {
+  auctionValidationSchema,
+  bidSchemaValidation,
+} = require("../helpers/auction-validation");
 const app = express();
 const port = process.env.PORT;
 
@@ -107,6 +110,14 @@ app.delete(
   authorizeUser(["artist", "admin"]),
   auctionCltr.delete
 );
+// bids
+app.post(
+  "/og/auction/bid/:id",
+  authenticateUser,
+  checkSchema(bidSchemaValidation),
+  auctionCltr.bid
+);
+app.get("/og/auction/bids", authenticateUser, auctionCltr.getBid);
 //Connection to server
 app.listen(port, () => {
   console.log("server running at ", port);
