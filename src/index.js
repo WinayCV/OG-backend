@@ -12,12 +12,14 @@ const http = require("http");
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173", // or the origin you want to allow
+    origin: "*", // or the origin you want to allow
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
 });
+require("../config/startAuction.js")(io);
+// const startAuction = require("../config/startAuction");
 const { checkSchema } = require("express-validator");
 const {
   userRegisterationSchema,
@@ -131,6 +133,6 @@ app.post(
 );
 app.get("/og/auction/bids", authenticateUser, auctionCltr.getBid);
 //Connection to server
-app.listen(port, () => {
+server.listen(port, () => {
   console.log("server running at ", port);
 });
