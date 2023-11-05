@@ -1,7 +1,23 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const app = express();
+app.use(express.json());
+app.use(cors());
 const configDB = require("../config/db");
+configDB();
+const socketIo = require("socket.io");
+const { createServer } = require("http");
+const http = require("http");
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:5173", // or the origin you want to allow
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true,
+  },
+});
 const { checkSchema } = require("express-validator");
 const {
   userRegisterationSchema,
@@ -25,12 +41,8 @@ const {
   auctionValidationSchema,
   bidSchemaValidation,
 } = require("../helpers/auction-validation");
-const app = express();
 const port = process.env.PORT;
 
-app.use(express.json());
-app.use(cors());
-configDB();
 //multer configurataion
 
 const upload = multer();
