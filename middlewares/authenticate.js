@@ -1,6 +1,6 @@
 const _ = require("lodash");
 const jwt = require("jsonwebtoken");
-const authenticateUser = async (req, res, next) => {
+const authenticateUser = (req, res, next) => {
   let token = req.headers["authorization"];
   if (!token) {
     return res.status(400).json({ error: { msg: "authentication failed" } });
