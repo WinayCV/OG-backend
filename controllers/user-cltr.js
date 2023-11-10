@@ -50,7 +50,6 @@ userCltr.register = async (req, res) => {
     const token = jwt.sign(tokenData, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
-    console.log(user.email);
     transporter.sendMail({
       from: process.env.G_EMAIL, // sender address
       to: `${user.email}`, // list of receivers
@@ -77,7 +76,8 @@ userCltr.verify = async (req, res) => {
   }
   try {
     const user = await User.findByIdAndUpdate(id, { isVerified: true });
-    res.json("verification confirmed");
+    res.redirect("http://localhost:5173/bid");
+    // res.json({ msg: "verification confirmed" });
   } catch (error) {
     res.status(500).json({ error });
   }

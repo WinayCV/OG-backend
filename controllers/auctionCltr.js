@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 const _ = require("lodash");
 const Auction = require("../models/auction-model");
 const Artwork = require("../models/artwork-model");
+const User = require("../models/user-model");
 
 const auctionCltr = {};
 
@@ -62,10 +63,19 @@ auctionCltr.bid = async (req, res) => {
     body.user = userId;
     body.artwork = artworkId;
     const artwork = await Artwork.findOne({ _id: artworkId });
+    console.log(artwork);
     if (artwork.currentBidAmount >= parseInt(body.amount)) {
       return res.status(400).json({
         error: {
-          masg: "Bid amount is less than current bid,please verify your your bid amount",
+          msg: "Bid amount is less than current bid,please verify your your bid amount",
+        },
+      });
+    }
+    const user = await User.findOne({ _id: userId });
+    if (user.credit < parseInt(body.amount)) {
+      return res.status(400).json({
+        error: {
+          msg: "You dont have enough credit to bid, please buy more credit",
         },
       });
     }

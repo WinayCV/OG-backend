@@ -30,6 +30,7 @@ module.exports = function (io) {
   // getting auction
   const startAuction = async () => {
     const auction = await Auction.findById(auctionId);
+    // here assign auction start and end time for the setTime out
     // console.log(auction.auctionStart);
     // console.log(auction.auctionEnd);
     const startTimeMillis =

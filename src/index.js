@@ -43,6 +43,8 @@ const {
   auctionValidationSchema,
   bidSchemaValidation,
 } = require("../helpers/auction-validation");
+const addressValidationSchema = require("../helpers/address-validation");
+const addressCltr = require("../controllers/address-Cltr");
 const port = process.env.PORT;
 
 //multer configurataion
@@ -132,6 +134,16 @@ app.post(
   auctionCltr.bid
 );
 app.get("/og/auction/bids", authenticateUser, auctionCltr.getBid);
+
+// address api
+app.post(
+  "/og/address",
+  authenticateUser,
+  checkSchema(addressValidationSchema),
+  addressCltr.create
+);
+app.delete("/og/address/:id", authenticateUser, addressCltr.delete);
+app.get("/og/address/list", authenticateUser, addressCltr.list);
 //Connection to server
 server.listen(port, () => {
   console.log("server running at ", port);

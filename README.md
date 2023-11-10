@@ -131,7 +131,7 @@ Order {
 buyer: ObjectId (reference to User),
 artwork: ObjectId (reference to Artwork),
 address:addressId
-amount: Number,
+payment: id,
 status: String (completed, pending),
 timestamp: Date,
 }
