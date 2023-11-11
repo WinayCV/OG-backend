@@ -72,7 +72,10 @@ artworkCltr.all = async (req, res) => {
 artworkCltr.one = async (req, res) => {
   const id = req.params.id;
   try {
-    const artwork = await Artwork.findOne({_id: id});
+    const artwork = await Artwork.findOne({_id: id}).populate(
+      'artist',
+      ['firstName', '_id']
+    );
     res.json(artwork);
   } catch (error) {
     res.status(500).json({error});
