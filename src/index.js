@@ -1,50 +1,50 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
 const app = express();
 app.use(express.json());
 app.use(cors());
-const configDB = require("../config/db");
+const configDB = require('../config/db');
 configDB();
-const socketIo = require("socket.io");
-const { createServer } = require("http");
-const http = require("http");
+const socketIo = require('socket.io');
+const {createServer} = require('http');
+const http = require('http');
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "*", // or the origin you want to allow
-    methods: ["GET", "POST"],
-    allowedHeaders: ["my-custom-header"],
+    origin: '*', // or the origin you want to allow
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['my-custom-header'],
     credentials: true,
   },
 });
-require("../config/startAuction.js")(io);
+require('../config/startAuction.js')(io);
 // const startAuction = require("../config/startAuction");
-const { checkSchema } = require("express-validator");
+const {checkSchema} = require('express-validator');
 const {
   userRegisterationSchema,
   userLoginSchema,
   userAdminSchema,
   userProfileEditSchmea,
-} = require("../helpers/user-Validation");
-const artworkCltr = require("../controllers/artwork-cltr");
-const userCltr = require("../controllers/user-cltr");
+} = require('../helpers/user-Validation');
+const artworkCltr = require('../controllers/artwork-cltr');
+const userCltr = require('../controllers/user-cltr');
 const {
   authenticateUser,
   authorizeUser,
-} = require("../middlewares/authenticate");
+} = require('../middlewares/authenticate');
 const {
   artworkValidationSchema,
   artworkEditSchema,
-} = require("../helpers/artwork-validation");
-const multer = require("multer");
-const auctionCltr = require("../controllers/auctionCltr");
+} = require('../helpers/artwork-validation');
+const multer = require('multer');
+const auctionCltr = require('../controllers/auctionCltr');
 const {
   auctionValidationSchema,
   bidSchemaValidation,
-} = require("../helpers/auction-validation");
-const addressValidationSchema = require("../helpers/address-validation");
-const addressCltr = require("../controllers/address-Cltr");
+} = require('../helpers/auction-validation');
+const addressValidationSchema = require('../helpers/address-validation');
+const addressCltr = require('../controllers/address-Cltr');
 const port = process.env.PORT;
 
 //multer configurataion
@@ -54,97 +54,98 @@ const upload = multer();
 //user
 
 app.post(
-  "/og/register",
+  '/og/register',
   checkSchema(userRegisterationSchema),
   userCltr.register
 );
-app.get("/og/verifyEmail/:token", userCltr.verify);
-app.post("/og/login", checkSchema(userLoginSchema), userCltr.login);
-app.get("/og/getProfile", authenticateUser, userCltr.account);
+app.get('/og/verifyEmail/:token', userCltr.verify);
+app.post('/og/login', checkSchema(userLoginSchema), userCltr.login);
+app.get('/og/getProfile', authenticateUser, userCltr.account);
 app.put(
-  "/og/editProfile",
+  '/og/editProfile',
   authenticateUser,
   checkSchema(userProfileEditSchmea),
   userCltr.edit
 );
-app.get("/og/allProfiles");
+app.get('/og/allProfiles');
 app.put(
-  "/og/editUserPriviliges/:id",
+  '/og/editUserPriviliges/:id',
   authenticateUser,
-  authorizeUser(["admin"]),
+  authorizeUser(['admin']),
   checkSchema(userAdminSchema),
   userCltr.role
 );
-app.delete("/og/deleteProfile");
+app.delete('/og/deleteProfile');
 
 //Artwork- //public
-app.get("/og/artwork/all", artworkCltr.all);
-app.get("/og/artwork/:id", artworkCltr.one);
+app.get('/og/artwork/all', artworkCltr.all);
+app.get('/og/artwork/:id', artworkCltr.one);
 
 //Artwork- //Artist
 app.post(
-  "/og/artwork/create",
+  '/og/artwork/create',
   authenticateUser,
-  authorizeUser(["artist"]),
-  upload.array("files"),
+  authorizeUser(['artist']),
+  upload.array('files'),
   checkSchema(artworkValidationSchema),
   artworkCltr.create
 );
 app.get(
-  "/og/artwork/list",
+  '/og/artwork/list',
   authenticateUser,
-  authorizeUser(["artist"]),
+  authorizeUser(['artist']),
   artworkCltr.list
 );
 app.put(
-  "/og/artwork/edit/:id",
+  '/og/artwork/edit/:id',
   authenticateUser,
-  authorizeUser(["artist"]),
-  upload.array("newImages"),
+  authorizeUser(['artist']),
+  upload.array('newImages'),
   checkSchema(artworkEditSchema),
   artworkCltr.edit
 ); // sending artwork id
 app.delete(
-  "/og/artwork/delete/:id",
+  '/og/artwork/delete/:id',
   authenticateUser,
-  authorizeUser(["artist", "admin"]),
+  authorizeUser(['artist', 'admin']),
   artworkCltr.delete
 );
 
 //Auction
 app.post(
-  "/og/auction/create",
+  '/og/auction/create',
   authenticateUser,
   checkSchema(auctionValidationSchema),
-  authorizeUser(["artist"]),
+  authorizeUser(['artist']),
   auctionCltr.create
 );
+app.get('/og/auction/active', auctionCltr.active);
 
 app.delete(
-  "/og/auction/delete/:id",
+  '/og/auction/delete/:id',
   authenticateUser,
-  authorizeUser(["artist", "admin"]),
+  authorizeUser(['artist', 'admin']),
   auctionCltr.delete
 );
 // bids
 app.post(
-  "/og/auction/bid/:id",
+  '/og/auction/bid/:id',
   authenticateUser,
   checkSchema(bidSchemaValidation),
   auctionCltr.bid
 );
-app.get("/og/auction/bids", authenticateUser, auctionCltr.getBid);
+app.get('/og/auction/bids', authenticateUser, auctionCltr.getBid);
 
 // address api
 app.post(
-  "/og/address",
+  '/og/address',
   authenticateUser,
   checkSchema(addressValidationSchema),
   addressCltr.create
 );
-app.delete("/og/address/:id", authenticateUser, addressCltr.delete);
-app.get("/og/address/list", authenticateUser, addressCltr.list);
+app.delete('/og/address/:id', authenticateUser, addressCltr.delete);
+app.get('/og/address/list', authenticateUser, addressCltr.list);
 //Connection to server
 server.listen(port, () => {
-  console.log("server running at ", port);
+  console.log('server running at ', port);
 });
