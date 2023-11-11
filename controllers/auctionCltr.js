@@ -23,13 +23,13 @@ auctionCltr.create = async (req, res) => {
     const auction = new Auction(body);
     // here i dont have to push the auction id to the artworks
     // adding auction Id to the artworks
-    // auction.artworks.map(async (artworkId) => {
-    //   const artwork = await Artwork.findOneAndUpdate(
-    //     {_id: artworkId, artist: req.user.id}
-    //     // {$set: {auction: auction._id}},
-    //     // {new: true, runValidators: true}
-    //   );
-    // });
+    auction.artworks.map(async (artworkId) => {
+      const artwork = await Artwork.findOneAndUpdate(
+        {_id: artworkId},
+        {$set: {auction: auction._id}},
+        {new: true, runValidators: true}
+      );
+    });
     const newAuction = await auction.save();
     const result = await Auction.findOne({
       _id: newAuction._id,

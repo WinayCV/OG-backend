@@ -72,10 +72,9 @@ artworkCltr.all = async (req, res) => {
 artworkCltr.one = async (req, res) => {
   const id = req.params.id;
   try {
-    const artwork = await Artwork.findOne({_id: id}).populate(
-      'artist',
-      ['firstName', '_id']
-    );
+    const artwork = await Artwork.findOne({_id: id})
+      .populate('artist', ['firstName', '_id'])
+      .populate('auction');
     res.json(artwork);
   } catch (error) {
     res.status(500).json({error});
@@ -97,13 +96,21 @@ artworkCltr.delete = async (req, res) => {
   try {
     if (req.user.role == 'artist') {
       const result = await Artwork.find({artist: userId, _id: id});
-      if (result.length != 0) {
-        const artwork = await Artwork.findByIdAndDelete(id);
-        return res.json({msg: 'Artwork deleted successfully'});
+      const filesData = result[0].images;
+      console.log(result[0].images);
+      for (const file of filesData) {
+        const result = await deleteFromS3(file.key);
       }
-      return res.json({msg: 'Cannot perform delete'});
+      const artwork = await Artwork.findByIdAndDelete(id);
+      return res.json({msg: 'Artwork deleted successfully'});
     }
     if (req.user.role == 'admin') {
+      const result = await Artwork.find({artist: userId, _id: id});
+      const filesData = result[0].images;
+      console.log(result[0].images);
+      for (const file of filesData) {
+        const result = await deleteFromS3(file.key);
+      }
       const artwork = await Artwork.findByIdAndDelete(id);
       res.json({msg: 'Artwork deleted successfully'});
     }
@@ -136,7 +143,7 @@ artworkCltr.edit = async (req, res) => {
       if (!artwork) {
         return res.status(404).json({msg: 'Artwork not found'});
       }
-      // getting the id to be of the image to be deleted
+      // getting the id  of the image to be deleted
       const oldImages = body.deleteImages.map(async (imageId) => {
         const id = imageId;
         const result = await Artwork.findOne({
