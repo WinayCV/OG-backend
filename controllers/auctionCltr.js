@@ -72,7 +72,7 @@ auctionCltr.bid = async (req, res) => {
     console.log(artwork);
     if (artwork.currentBidAmount >= parseInt(body.amount)) {
       return res.status(400).json({
-        error: {
+        errors: {
           msg: 'Bid amount is less than current bid,please verify your your bid amount',
         },
       });
