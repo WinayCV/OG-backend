@@ -149,7 +149,7 @@ app.get('/og/address/list', authenticateUser, addressCltr.list);
 
 // payment
 app.post('/og/payment', authenticateUser, paymentCltr.create);
-app.post('/og/payment/:id', authenticateUser, paymentCltr.update);
+app.put('/og/payment/:id', authenticateUser, paymentCltr.update);
 
 //Connection to server
 server.listen(port, () => {

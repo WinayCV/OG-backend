@@ -69,7 +69,6 @@ auctionCltr.bid = async (req, res) => {
     body.user = userId;
     body.artwork = artworkId;
     const artwork = await Artwork.findOne({_id: artworkId});
-    console.log(artwork);
     if (artwork.currentBidAmount >= parseInt(body.amount)) {
       return res.status(400).json({
         errors: [

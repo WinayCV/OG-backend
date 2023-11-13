@@ -9,7 +9,6 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 paymentCltr.create = async (req, res) => {
   const body = _.pick(req.body, ['amount']);
   try {
-    console.log(body);
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
@@ -25,8 +24,8 @@ paymentCltr.create = async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: 'http://localhost:5173/success',
-      cancel_url: 'http://localhost:5173/cancel',
+      success_url: 'http://localhost:5173/profile?status=success',
+      cancel_url: 'http://localhost:5173/profile?status=failed',
     });
 
     const payment = new Payment();
@@ -37,7 +36,11 @@ paymentCltr.create = async (req, res) => {
     payment.status = 'pending';
     const paymentDoc = await payment.save();
 
-    res.json({url: session.url, id: session.id});
+    res.json({
+      url: session.url,
+      id: session.id,
+      status: payment.status,
+    });
   } catch (error) {
     res.status(500).json({error});
   }
@@ -53,8 +56,24 @@ paymentCltr.update = async (req, res) => {
       {status: 'paid'},
       {new: true}
     );
-    // const user = await User.
-    res.json({data: updatedDoc});
+    const user = await User.findByIdAndUpdate(
+      {_id: req.user.id},
+      {$inc: {credit: updatedDoc.amount}}, // Use $inc to increment the credit field by the specified amount
+      {new: true}
+    );
+    res.json({msg: 'Credit had been updated', credit: user.credit});
+  } catch (error) {
+    res.status(500).json({error});
+  }
+};
+
+paymentCltr.delete = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const updatedDoc = await Payment.findOneAndDelete({
+      transactionId: id,
+    });
+    res.json({msg: 'payment deleted'});
   } catch (error) {
     res.status(500).json({error});
   }
