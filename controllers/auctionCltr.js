@@ -69,6 +69,7 @@ auctionCltr.bid = async (req, res) => {
     body.user = userId;
     body.artwork = artworkId;
     const artwork = await Artwork.findOne({_id: artworkId});
+
     if (artwork.currentBidAmount >= parseInt(body.amount)) {
       return res.status(400).json({
         errors: [
@@ -93,6 +94,7 @@ auctionCltr.bid = async (req, res) => {
       {$set: {currentBidAmount: body.amount}},
       {new: true, runValidators: true}
     );
+    // im finding auction based on artworkID
     const auction = await Auction.findOneAndUpdate(
       {
         artworks: {$in: [artworkId]},
@@ -100,7 +102,33 @@ auctionCltr.bid = async (req, res) => {
       {$push: {bids: bid}},
       {new: true, runValidators: true}
     );
-    res.json(auction);
+    // here debit the credit from the guy who bids
+    const updatedUser = await User.findOneAndUpdate(
+      {_id: userId},
+      {$inc: {credit: -body.amount}},
+      {new: true} // Return the updated document
+    );
+
+    // here credit back the amount to the guy who got out bided
+    const result = await Auction.findOne({
+      artworks: artworkId,
+    });
+    if (result) {
+      const bids = result.bids;
+      const secondLastBid =
+        bids.length >= 2 ? bids[bids.length - 2] : null;
+      if (secondLastBid) {
+        const refundAmount = secondLastBid.amount;
+        const refundUser = secondLastBid.user;
+        const updatedUser = await User.findOneAndUpdate(
+          {_id: refundUser},
+          {$inc: {credit: refundAmount}},
+          {new: true} // Return the updated document
+        );
+      }
+    }
+
+    res.json({auction, updatedUser});
   } catch (error) {
     res.status(500).json({error});
   }

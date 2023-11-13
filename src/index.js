@@ -150,6 +150,7 @@ app.get('/og/address/list', authenticateUser, addressCltr.list);
 // payment
 app.post('/og/payment', authenticateUser, paymentCltr.create);
 app.put('/og/payment/:id', authenticateUser, paymentCltr.update);
+app.delete('/og/payment/:id', authenticateUser, paymentCltr.delete);
 
 //Connection to server
 server.listen(port, () => {
