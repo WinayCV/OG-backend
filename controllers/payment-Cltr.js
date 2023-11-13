@@ -1,13 +1,21 @@
 const Payment = require('../models/payment-model');
 const _ = require('lodash');
 const User = require('../models/user-model');
+const {validationResult} = require('express-validator');
+const {CloudHSM} = require('aws-sdk');
 
 const paymentCltr = {};
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 paymentCltr.create = async (req, res) => {
+  const errors = validationResult(req);
+  console.log(errors);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({errors: errors.array()});
+  }
   const body = _.pick(req.body, ['amount']);
+  console.log(body);
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],

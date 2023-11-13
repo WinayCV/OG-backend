@@ -46,6 +46,7 @@ const {
 const addressValidationSchema = require('../helpers/address-validation');
 const addressCltr = require('../controllers/address-Cltr');
 const paymentCltr = require('../controllers/payment-Cltr');
+const paymentValidatioSchema = require('../helpers/payment-validation');
 const port = process.env.PORT;
 
 //multer configurataion
@@ -148,7 +149,12 @@ app.delete('/og/address/:id', authenticateUser, addressCltr.delete);
 app.get('/og/address/list', authenticateUser, addressCltr.list);
 
 // payment
-app.post('/og/payment', authenticateUser, paymentCltr.create);
+app.post(
+  '/og/payment',
+  authenticateUser,
+  checkSchema(paymentValidatioSchema),
+  paymentCltr.create
+);
 app.put('/og/payment/:id', authenticateUser, paymentCltr.update);
 app.delete('/og/payment/:id', authenticateUser, paymentCltr.delete);
 
