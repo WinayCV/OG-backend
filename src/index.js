@@ -45,6 +45,7 @@ const {
 } = require('../helpers/auction-validation');
 const addressValidationSchema = require('../helpers/address-validation');
 const addressCltr = require('../controllers/address-Cltr');
+const paymentCltr = require('../controllers/payment-Cltr');
 const port = process.env.PORT;
 
 //multer configurataion
@@ -145,6 +146,11 @@ app.post(
 );
 app.delete('/og/address/:id', authenticateUser, addressCltr.delete);
 app.get('/og/address/list', authenticateUser, addressCltr.list);
+
+// payment
+app.post('/og/payment', authenticateUser, paymentCltr.create);
+app.post('/og/payment/:id', authenticateUser, paymentCltr.update);
+
 //Connection to server
 server.listen(port, () => {
   console.log('server running at ', port);

@@ -97,7 +97,6 @@ artworkCltr.delete = async (req, res) => {
     if (req.user.role == 'artist') {
       const result = await Artwork.find({artist: userId, _id: id});
       const filesData = result[0].images;
-      console.log(result[0].images);
       for (const file of filesData) {
         const result = await deleteFromS3(file.key);
       }
@@ -107,7 +106,6 @@ artworkCltr.delete = async (req, res) => {
     if (req.user.role == 'admin') {
       const result = await Artwork.find({artist: userId, _id: id});
       const filesData = result[0].images;
-      console.log(result[0].images);
       for (const file of filesData) {
         const result = await deleteFromS3(file.key);
       }

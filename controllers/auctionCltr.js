@@ -72,17 +72,21 @@ auctionCltr.bid = async (req, res) => {
     console.log(artwork);
     if (artwork.currentBidAmount >= parseInt(body.amount)) {
       return res.status(400).json({
-        errors: {
-          msg: 'Bid amount is less than current bid,please verify your your bid amount',
-        },
+        errors: [
+          {
+            msg: 'Bid amount is less than current bid,please verify your your bid amount',
+          },
+        ],
       });
     }
     const user = await User.findOne({_id: userId});
     if (user.credit < parseInt(body.amount)) {
       return res.status(400).json({
-        error: {
-          msg: 'You dont have enough credit to bid, please buy more credit',
-        },
+        errors: [
+          {
+            msg: 'You dont have enough credit to bid, please buy more credit',
+          },
+        ],
       });
     }
     await Artwork.findOneAndUpdate(
