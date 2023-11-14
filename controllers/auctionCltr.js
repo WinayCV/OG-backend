@@ -101,7 +101,7 @@ auctionCltr.bid = async (req, res) => {
       },
       {$push: {bids: bid}},
       {new: true, runValidators: true}
-    );
+    ).populate('artworks');
     // here debit the credit from the guy who bids
     const updatedUser = await User.findOneAndUpdate(
       {_id: userId},
@@ -112,7 +112,7 @@ auctionCltr.bid = async (req, res) => {
     // here credit back the amount to the guy who got out bided
     const result = await Auction.findOne({
       artworks: artworkId,
-    });
+    }).populate('artworks');
     if (result) {
       const bids = result.bids;
       const secondLastBid =
@@ -158,7 +158,17 @@ auctionCltr.active = async (req, res) => {
     const artwork = await auctions.map((auction) => {
       return auction.artworks;
     });
-    res.json(artwork.flat());
+
+    const result = artwork.flat().map((ele) => {
+      const result = auctions.find(
+        (auction) => toString(auction._id) === toString(ele.auction)
+      );
+      if (result) {
+        return {...ele._doc, type: result.auctionType};
+      }
+    });
+
+    res.json(result);
   } catch (error) {
     res.status(500).json({error});
   }
