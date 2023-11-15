@@ -7,10 +7,10 @@ const {uploadToS3, deleteFromS3} = require('../config/aws');
 const artworkCltr = {};
 
 artworkCltr.create = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({errors: errors.array()});
-  }
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   return res.status(400).json({errors: errors.array()});
+  // }
   try {
     const files = req.files; // using multer for file uploads
     let images = [];
@@ -23,6 +23,7 @@ artworkCltr.create = async (req, res) => {
       'images',
     ]);
     // store tags has array of ids
+
     const body = await Artwork(artworkFile);
     const userId = req.user.id;
     body.artist = userId;
@@ -196,6 +197,41 @@ artworkCltr.edit = async (req, res) => {
     );
 
     res.json(editArtwork);
+  } catch (error) {
+    res.status(500).json({error});
+  }
+};
+
+artworkCltr.tags = async (req, res) => {
+  try {
+    const tags = await Artwork.aggregate([
+      // Unwind the searchTag array
+      {$unwind: '$searchTag'},
+
+      // Convert the tag name to lowercase
+      {
+        $project: {
+          lowerCaseName: {$toLower: '$searchTag.name'},
+        },
+      },
+
+      // Group by the lowercase name field and create an array of unique tags
+      {
+        $group: {
+          _id: null,
+          uniqueTags: {$addToSet: '$lowerCaseName'},
+        },
+      },
+
+      // Project to reshape the result if needed
+      {
+        $project: {
+          _id: 0,
+          uniqueTags: 1,
+        },
+      },
+    ]);
+    res.json(tags[0].uniqueTags);
   } catch (error) {
     res.status(500).json({error});
   }

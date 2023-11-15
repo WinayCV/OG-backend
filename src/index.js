@@ -112,7 +112,7 @@ app.delete(
   authorizeUser(['artist', 'admin']),
   artworkCltr.delete
 );
-
+app.get('/og/artworktag', artworkCltr.tags);
 //Auction
 app.post(
   '/og/auction/create',

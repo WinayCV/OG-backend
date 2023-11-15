@@ -150,6 +150,7 @@ auctionCltr.getBid = async (req, res) => {
 
 //to get all auction
 auctionCltr.active = async (req, res) => {
+  const auctionType = req.query.type;
   try {
     const artworks = [];
     const auctions = await Auction.find({
@@ -158,17 +159,26 @@ auctionCltr.active = async (req, res) => {
     const artwork = await auctions.map((auction) => {
       return auction.artworks;
     });
+    const newArray = artwork.flat();
+    const output = newArray.map((ele) => {
+      const result = auctions.find((auction) => {
+        return auction._id.equals(ele.auction);
+      });
 
-    const result = artwork.flat().map((ele) => {
-      const result = auctions.find(
-        (auction) => toString(auction._id) === toString(ele.auction)
-      );
-      if (result) {
-        return {...ele._doc, type: result.auctionType};
-      }
+      return {
+        ...ele._doc,
+        type: result.auctionType,
+        start: result.auctionStart,
+        end: result.auctionEnd,
+      };
     });
-
-    res.json(result);
+    if (auctionType) {
+      const newOutput = output.filter((ele) => {
+        return ele.type == auctionType;
+      });
+      return res.json(newOutput);
+    }
+    res.json(output);
   } catch (error) {
     res.status(500).json({error});
   }
