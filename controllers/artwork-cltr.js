@@ -21,6 +21,7 @@ artworkCltr.create = async (req, res) => {
       'searchTag',
       'status',
       'images',
+      'currentBidAmount',
     ]);
     // store tags has array of ids
 
@@ -56,7 +57,7 @@ artworkCltr.create = async (req, res) => {
 
     body.images = images;
     const output = await body.save();
-    res.json(body);
+    res.json({msg: 'Artwork created'});
   } catch (error) {
     res.status(500).json({error: error.message});
   }
@@ -85,7 +86,15 @@ artworkCltr.list = async (req, res) => {
   const id = req.user.id;
 
   try {
-    const artwork = await Artwork.find({artist: id});
+    const artwork = await Artwork.find({artist: id}).populate({
+      path: 'auction',
+      populate: {
+        path: 'bids',
+        populate: {
+          path: 'user',
+        },
+      },
+    });
     res.json(artwork);
   } catch (error) {
     res.status(500).json({error});

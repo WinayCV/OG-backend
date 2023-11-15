@@ -79,10 +79,6 @@ app.put(
 );
 app.delete('/og/deleteProfile');
 
-//Artwork- //public
-app.get('/og/artwork/all', artworkCltr.all);
-app.get('/og/artwork/:id', artworkCltr.one);
-
 //Artwork- //Artist
 app.post(
   '/og/artwork/create',
@@ -129,6 +125,9 @@ app.delete(
   authorizeUser(['artist', 'admin']),
   auctionCltr.delete
 );
+//Artwork- //public
+app.get('/og/artwork/all', artworkCltr.all);
+app.get('/og/artwork/:id', artworkCltr.one);
 // bids
 app.post(
   '/og/auction/bid/:id',
