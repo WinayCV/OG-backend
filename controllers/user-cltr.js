@@ -105,7 +105,7 @@ userCltr.login = async (req, res) => {
         ],
       });
     }
-    const result = bcrypt.compare(body.password, user.password);
+    const result = await bcrypt.compare(body.password, user.password);
     if (!result) {
       return res
         .status(400)
