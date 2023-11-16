@@ -11,6 +11,7 @@ auctionCltr.create = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({errors: errors.array()});
   }
+
   const body = _.pick(req.body, [
     'auctionEnd',
     'auctionStart',
@@ -18,7 +19,6 @@ auctionCltr.create = async (req, res) => {
     'artworks',
   ]);
   try {
-    let errorsArray = [];
     body.artist = req.user.id;
     const auction = new Auction(body);
     // here i dont have to push the auction id to the artworks
@@ -164,7 +164,6 @@ auctionCltr.active = async (req, res) => {
       const result = auctions.find((auction) => {
         return auction._id.equals(ele.auction);
       });
-
       return {
         ...ele._doc,
         type: result.auctionType,
@@ -172,6 +171,7 @@ auctionCltr.active = async (req, res) => {
         end: result.auctionEnd,
       };
     });
+
     if (auctionType) {
       const newOutput = output.filter((ele) => {
         return ele.type == auctionType;
@@ -186,7 +186,9 @@ auctionCltr.active = async (req, res) => {
 
 auctionCltr.myAuction = async (req, res) => {
   try {
-    const auction = await Auction.find({artist: req.user.id});
+    const auction = await Auction.find({
+      artist: req.user.id,
+    }).populate('artworks');
     res.json(auction);
   } catch (error) {
     res.status(500).json({error});
