@@ -34,7 +34,7 @@ auctionCltr.create = async (req, res) => {
     const result = await Auction.findOne({
       _id: newAuction._id,
     }).populate('artworks');
-    res.json({msg: 'auction has been created', result});
+    res.json({msg: 'auction has been created', auction});
   } catch (error) {
     res.status(500).json({error});
   }
@@ -179,6 +179,15 @@ auctionCltr.active = async (req, res) => {
       return res.json(newOutput);
     }
     res.json(output);
+  } catch (error) {
+    res.status(500).json({error});
+  }
+};
+
+auctionCltr.myAuction = async (req, res) => {
+  try {
+    const auction = await Auction.find({artist: req.user.id});
+    res.json(auction);
   } catch (error) {
     res.status(500).json({error});
   }

@@ -11,18 +11,18 @@ const auctionValidationSchema = {
   // },
   auctionStart: {
     notEmpty: {
-      errorMessage: "need an auction start date to begin",
+      errorMessage: 'need an auction start date to begin',
       bail: true,
     },
 
     isISO8601: {
-      errorMessage: "Invalid Date and Time.",
+      errorMessage: 'Invalid Date and Time.',
       bail: true,
     },
     custom: {
       options: (value) => {
         if (new Date(value) < new Date()) {
-          throw new Error("start date cannot be less today");
+          throw new Error('start date cannot be less today');
         } else {
           return true;
         }
@@ -31,18 +31,18 @@ const auctionValidationSchema = {
   },
   auctionEnd: {
     notEmpty: {
-      errorMessage: "Auction end date cannot be empty",
+      errorMessage: 'Auction end date cannot be empty',
       bail: true,
     },
     isISO8601: {
-      errorMessage: "Invalid Date and Time.",
+      errorMessage: 'Invalid Date and Time.',
       bail: true,
     },
     custom: {
-      options: (value, { req }) => {
+      options: (value, {req}) => {
         if (new Date(value) <= new Date(req.body.auctionStart)) {
           throw new Error(
-            "Auction end date cannot be less than the auction start date"
+            'Auction end date cannot be less than the auction start date'
           );
         } else {
           return true;
@@ -52,7 +52,7 @@ const auctionValidationSchema = {
   },
   auctionType: {
     notEmpty: {
-      errorMessage: "cannot be empty",
+      errorMessage: 'cannot be empty',
       bail: true,
     },
   },
@@ -61,8 +61,8 @@ const auctionValidationSchema = {
 const bidSchemaValidation = {
   amount: {
     notEmpty: {
-      errorMessage: "Amount cannot be empty",
+      errorMessage: 'Amount cannot be empty',
     },
   },
 };
-module.exports = { auctionValidationSchema, bidSchemaValidation };
+module.exports = {auctionValidationSchema, bidSchemaValidation};

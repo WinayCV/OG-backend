@@ -118,6 +118,12 @@ app.post(
   auctionCltr.create
 );
 app.get('/og/auction/active', auctionCltr.active);
+app.get(
+  '/og/myauction',
+  authenticateUser,
+  authorizeUser(['artist']),
+  auctionCltr.myAuction
+);
 
 app.delete(
   '/og/auction/delete/:id',
