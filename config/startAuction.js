@@ -29,12 +29,56 @@ module.exports = function (io) {
                 msg: 'You do not have enough credit to bid, please buy more credit',
               });
             } else {
+              // updating current bid in artwork
               await Artwork.findOneAndUpdate(
                 {_id: data.artworkId},
                 {$set: {currentBidAmount: data.bid.amount}},
                 {new: true, runValidators: true}
               );
-              io.to(data.id).emit('receive_bid', data);
+              // updating bids inside suction
+              const auction = await Auction.findOneAndUpdate(
+                {
+                  artworks: {$in: [data.artworkId]},
+                },
+                {
+                  $push: {
+                    bids: {
+                      user: user.id,
+                      amount: data.bid.amount,
+                      artwork: data.artworkId,
+                    },
+                  },
+                },
+                {new: true, runValidators: true}
+              ).populate('artworks');
+              // here debit the credit from the guy who bids
+              await User.findOneAndUpdate(
+                {_id: user.id},
+                {$inc: {credit: -data.bid.amount}},
+                {new: true} // Return the updated document
+              );
+              // here credit back the amount to the guy who got out bided
+              const result = await Auction.findOne({
+                artworks: data.artworkId,
+              }).populate('artworks');
+              if (result) {
+                const bids = result.bids.filter((bid) => {
+                  return bid.artwork == data.artworkId;
+                });
+                const secondLastBid =
+                  bids.length >= 2 ? bids[bids.length - 2] : null;
+                console.log(secondLastBid);
+                if (secondLastBid) {
+                  const refundAmount = secondLastBid.amount;
+                  const refundUser = secondLastBid.user;
+                  const updatedUser = await User.findOneAndUpdate(
+                    {_id: refundUser},
+                    {$inc: {credit: refundAmount}},
+                    {new: true} // Return the updated document
+                  );
+                }
+              }
+              io.to(data.id).emit('receive_bid', auction);
             }
           }
         } catch (error) {
