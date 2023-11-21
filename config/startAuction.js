@@ -61,6 +61,7 @@ module.exports = function (io) {
               const result = await Auction.findOne({
                 artworks: data.artworkId,
               }).populate('artworks');
+              let updatedUser = {};
               if (result) {
                 const bids = result.bids.filter((bid) => {
                   return bid.artwork == data.artworkId;
@@ -71,14 +72,18 @@ module.exports = function (io) {
                 if (secondLastBid) {
                   const refundAmount = secondLastBid.amount;
                   const refundUser = secondLastBid.user;
-                  const updatedUser = await User.findOneAndUpdate(
+                  updatedUser = await User.findOneAndUpdate(
                     {_id: refundUser},
                     {$inc: {credit: refundAmount}},
                     {new: true} // Return the updated document
                   );
                 }
               }
-              io.to(data.id).emit('receive_bid', auction);
+              io.to(data.id).emit('receive_bid', {
+                auction,
+                updatedUser,
+                artworkId: data.artworkId,
+              });
             }
           }
         } catch (error) {
