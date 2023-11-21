@@ -137,6 +137,7 @@ app.get('/og/auction/live', authenticateUser, auctionCltr.live);
 app.get('/og/artwork/all', artworkCltr.all);
 app.get('/og/artwork/:id', artworkCltr.one);
 // bids
+// regular bid
 app.post(
   '/og/auction/bid/:id',
   authenticateUser,

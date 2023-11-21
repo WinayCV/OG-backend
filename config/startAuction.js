@@ -1,87 +1,54 @@
-// // const startTime = '2023-11-18T14:30:00.000Z';
-// // const endTime = '2023-11-20T15:30:00.000Z';
+const Artwork = require('../models/artwork-model');
 const Auction = require('../models/auction-model');
-// const jwt = require('jsonwebtoken');
-// let auctionId = '';
-// let user = {};
+const jwt = require('jsonwebtoken');
+const User = require('../models/user-model');
 
 module.exports = function (io) {
   io.on('connection', (socket) => {
     console.log('a user connected');
+    let token = socket.handshake.headers['my-custom-header'];
+    token = token.split(' ')[1];
+    user = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(user.id);
 
     socket.on('join_auction', (data) => {
       console.log('User connected to room', data);
-      socket.join(data); // Join the specific room (auction ID)
-      // Assuming Auction.findById returns a promise
-      socket.on('send_bid', (data) => {
-        Auction.findById({_id: data.id})
-          .then((auction) => {
-            console.log(auction);
-            io.to(data.id).emit('receive_bid', data); // Emitting bid to all clients in the room
-          })
-          .catch((err) => {
-            console.error('Error fetching auction:', err);
+      socket.join(data);
+
+      socket.on('send_bid', async (data) => {
+        try {
+          const artwork = await Artwork.findById(data.artworkId);
+          if (artwork.currentBidAmount >= parseInt(data.bid.amount)) {
+            socket.emit('error', {
+              msg: 'Bid amount is less than current bid, please verify your bid amount',
+            });
+          } else {
+            const userData = await User.findById(user.id);
+            if (userData.credit < parseInt(data.bid.amount)) {
+              socket.emit('error', {
+                msg: 'You do not have enough credit to bid, please buy more credit',
+              });
+            } else {
+              await Artwork.findOneAndUpdate(
+                {_id: data.artworkId},
+                {$set: {currentBidAmount: data.bid.amount}},
+                {new: true, runValidators: true}
+              );
+              io.to(data.id).emit('receive_bid', data);
+            }
+          }
+        } catch (error) {
+          console.error('Error in bidding:', error);
+          socket.emit('error', {
+            msg: 'An error occurred while processing your bid',
           });
-        console.log(data);
+        }
       });
 
       socket.on('disconnect', () => {
         console.log('user disconnected', data);
-        socket.leave(data); // Leaving the room when disconnected
+        socket.leave(data);
       });
     });
   });
 };
-
-//   // authenticating user token
-//   io.use((socket, next) => {
-//     let token = socket.handshake.headers['my-custom-header'];
-//     auctionId = socket.handshake.query.id;
-
-//     if (!token && !auctionId) {
-//       socket.emit('authentication', {
-//         error: {msg: 'Authentication failed'},
-//       });
-//       return next(new Error('Authentication error'));
-//     }
-//     token = token.split(' ')[1];
-//     try {
-//       user = jwt.verify(token, process.env.JWT_SECRET);
-//       // auctionId = auctionId.split('=')[1].split('&')[0];
-//       startAuction();
-//       next();
-//     } catch (error) {
-//       socket.emit('authentication', {error});
-//       next(new Error('Authentication error'));
-//     }
-// });
-//   // getting auction
-//   const startAuction = async () => {
-//
-//     // here assign auction start and end time for the setTime out
-//     const startTime = auction.auctionStart;
-//     const endTime = auction.auctionEnd;
-//     console.log(auction.auctionStart);
-//     console.log(auction.auctionEnd);
-//     const startTimeMillis =
-//       new Date(new Date(startTime) + 1 * 60 * 1000).getTime() +
-//       5.5 * 60 * 60 * 1000;
-//     const endTimeMillis =
-//       new Date(new Date(endTime) + 1 * 60 * 1000).getTime() +
-//       5.5 * 60 * 60 * 1000;
-//     const now = new Date(Date.now()).getTime() + 5.5 * 60 * 60 * 1000;
-//     const diff = startTimeMillis - now;
-//     const diff1 = endTimeMillis - now;
-
-//     setTimeout(() => {
-//       console.log('timer starts');
-//     }, diff);
-//     setTimeout(() => {
-//       io.close(); // Disconnect the socket
-//       // io.sockets.sockets.forEach((socket) => {
-//       //   socket.disconnect(true);
-//       // });
-//       console.log('stop');
-//     }, diff1);
-//   };
-// };
