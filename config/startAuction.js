@@ -5,11 +5,10 @@ const User = require('../models/user-model');
 
 module.exports = function (io) {
   io.on('connection', (socket) => {
-    console.log('a user connected');
+    console.log(`${socket.id} user connected`);
     let token = socket.handshake.headers['my-custom-header'];
     token = token.split(' ')[1];
     user = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(user.id);
 
     socket.on('join_auction', (data) => {
       console.log('User connected to room', data);
@@ -23,7 +22,7 @@ module.exports = function (io) {
               msg: 'Bid amount is less than current bid, please verify your bid amount',
             });
           } else {
-            const userData = await User.findById(user.id);
+            const userData = await User.findById(data.userId);
             if (userData.credit < parseInt(data.bid.amount)) {
               socket.emit('error', {
                 msg: 'You do not have enough credit to bid, please buy more credit',
@@ -43,7 +42,7 @@ module.exports = function (io) {
                 {
                   $push: {
                     bids: {
-                      user: user.id,
+                      user: data.userId,
                       amount: data.bid.amount,
                       artwork: data.artworkId,
                     },
@@ -68,21 +67,28 @@ module.exports = function (io) {
                 });
                 const secondLastBid =
                   bids.length >= 2 ? bids[bids.length - 2] : null;
-                console.log(secondLastBid);
                 if (secondLastBid) {
                   const refundAmount = secondLastBid.amount;
                   const refundUser = secondLastBid.user;
-                  updatedUser = await User.findOneAndUpdate(
+                  console.log(refundUser);
+                  credictedUser = await User.findOneAndUpdate(
                     {_id: refundUser},
                     {$inc: {credit: refundAmount}},
                     {new: true} // Return the updated document
                   );
                 }
               }
+              console.log(data.userId);
+              const biddedUser = await User.findById({
+                _id: data.userId,
+              });
+
               io.to(data.id).emit('receive_bid', {
                 auction,
-                updatedUser,
+                biddedUser,
+                credictedUser,
                 artworkId: data.artworkId,
+                token,
               });
             }
           }
