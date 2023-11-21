@@ -19,6 +19,7 @@ const io = socketIo(server, {
   },
 });
 require('../config/startAuction.js')(io);
+
 // const startAuction = require("../config/startAuction");
 const {checkSchema} = require('express-validator');
 const {
@@ -131,6 +132,7 @@ app.delete(
   authorizeUser(['artist', 'admin']),
   auctionCltr.delete
 );
+app.get('/og/auction/live', authenticateUser, auctionCltr.live);
 //Artwork- //public
 app.get('/og/artwork/all', artworkCltr.all);
 app.get('/og/artwork/:id', artworkCltr.one);

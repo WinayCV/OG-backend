@@ -88,12 +88,17 @@ artworkCltr.list = async (req, res) => {
   try {
     const artwork = await Artwork.find({artist: id}).populate({
       path: 'auction',
-      populate: {
-        path: 'bids',
-        populate: {
-          path: 'user',
+      populate: [
+        {
+          path: 'bids',
+          populate: {
+            path: 'user',
+          },
         },
-      },
+        {
+          path: 'artist',
+        },
+      ],
     });
     res.json(artwork);
   } catch (error) {

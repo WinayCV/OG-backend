@@ -194,4 +194,22 @@ auctionCltr.myAuction = async (req, res) => {
     res.status(500).json({error});
   }
 };
+
+auctionCltr.live = async (req, res) => {
+  try {
+    const liveAuction = await Auction.find({
+      auctionType: 'live',
+    }).populate([
+      {
+        path: 'artworks',
+      },
+      {
+        path: 'artist',
+      },
+    ]);
+    res.json(liveAuction);
+  } catch (error) {
+    res.status(500).json({error});
+  }
+};
 module.exports = auctionCltr;
