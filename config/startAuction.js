@@ -2,6 +2,7 @@ const Artwork = require('../models/artwork-model');
 const Auction = require('../models/auction-model');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user-model');
+const {CloudHSM} = require('aws-sdk');
 
 module.exports = function (io) {
   io.on('connection', (socket) => {
@@ -15,6 +16,7 @@ module.exports = function (io) {
       socket.join(data);
 
       socket.on('send_bid', async (data) => {
+        console.log(data);
         try {
           const artwork = await Artwork.findById(data.artworkId);
           if (artwork.currentBidAmount >= parseInt(data.bid.amount)) {
@@ -52,7 +54,7 @@ module.exports = function (io) {
               ).populate('artworks');
               // here debit the credit from the guy who bids
               await User.findOneAndUpdate(
-                {_id: user.id},
+                {_id: data.userId},
                 {$inc: {credit: -data.bid.amount}},
                 {new: true} // Return the updated document
               );
@@ -70,7 +72,6 @@ module.exports = function (io) {
                 if (secondLastBid) {
                   const refundAmount = secondLastBid.amount;
                   const refundUser = secondLastBid.user;
-                  console.log(refundUser);
                   credictedUser = await User.findOneAndUpdate(
                     {_id: refundUser},
                     {$inc: {credit: refundAmount}},
@@ -78,7 +79,6 @@ module.exports = function (io) {
                   );
                 }
               }
-              console.log(data.userId);
               const biddedUser = await User.findById({
                 _id: data.userId,
               });

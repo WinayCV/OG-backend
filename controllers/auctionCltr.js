@@ -84,7 +84,7 @@ auctionCltr.bid = async (req, res) => {
       return res.status(400).json({
         errors: [
           {
-            msg: 'You dont have enough credit to bid, please buy more credit',
+            msg: 'You do not have enough credit to bid, please buy more credit',
           },
         ],
       });
