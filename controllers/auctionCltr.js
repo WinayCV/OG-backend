@@ -188,7 +188,15 @@ auctionCltr.myAuction = async (req, res) => {
   try {
     const auction = await Auction.find({
       artist: req.user.id,
-    }).populate('artworks');
+    })
+      .populate('artworks')
+      .populate({
+        path: 'bids',
+        populate: {
+          path: 'user artwork',
+        },
+      });
+
     res.json(auction);
   } catch (error) {
     res.status(500).json({error});

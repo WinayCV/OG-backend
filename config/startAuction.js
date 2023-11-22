@@ -16,7 +16,6 @@ module.exports = function (io) {
       socket.join(data);
 
       socket.on('send_bid', async (data) => {
-        console.log(data);
         try {
           const artwork = await Artwork.findById(data.artworkId);
           if (artwork.currentBidAmount >= parseInt(data.bid.amount)) {
@@ -51,7 +50,24 @@ module.exports = function (io) {
                   },
                 },
                 {new: true, runValidators: true}
-              ).populate('artworks');
+              );
+              const populatedAuction = await updatedAuction
+                .populate({
+                  path: 'artworks',
+                  populate: [
+                    {
+                      path: 'bids',
+                      populate: {
+                        path: 'user',
+                      },
+                    },
+                    {
+                      path: 'artist',
+                    },
+                  ],
+                })
+                .execPopulate();
+
               // here debit the credit from the guy who bids
               await User.findOneAndUpdate(
                 {_id: data.userId},
