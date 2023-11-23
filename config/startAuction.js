@@ -50,23 +50,7 @@ module.exports = function (io) {
                   },
                 },
                 {new: true, runValidators: true}
-              );
-              const populatedAuction = await updatedAuction
-                .populate({
-                  path: 'artworks',
-                  populate: [
-                    {
-                      path: 'bids',
-                      populate: {
-                        path: 'user',
-                      },
-                    },
-                    {
-                      path: 'artist',
-                    },
-                  ],
-                })
-                .execPopulate();
+              ).populate('artworks');
 
               // here debit the credit from the guy who bids
               await User.findOneAndUpdate(
