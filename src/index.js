@@ -48,6 +48,8 @@ const addressValidationSchema = require('../helpers/address-validation');
 const addressCltr = require('../controllers/address-Cltr');
 const paymentCltr = require('../controllers/payment-Cltr');
 const paymentValidatioSchema = require('../helpers/payment-validation');
+const orderCltr = require('../controllers/order-Cltr');
+const orderValidationSchema = require('../helpers/order-validation');
 const port = process.env.PORT;
 
 //multer configurataion
@@ -165,7 +167,14 @@ app.post(
 );
 app.put('/og/payment/:id', authenticateUser, paymentCltr.update);
 app.delete('/og/payment/:id', authenticateUser, paymentCltr.delete);
+// oders
 
+app.post(
+  '/og/order',
+  authenticateUser,
+  checkSchema(orderValidationSchema),
+  orderCltr.create
+);
 //Connection to server
 server.listen(port, () => {
   console.log('server running at ', port);

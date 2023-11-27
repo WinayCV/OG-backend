@@ -15,8 +15,10 @@ const orderSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Address',
     },
+    payment: String,
     status: {
       type: String,
+      default: 'pending',
       enum: ['pending', 'fullfiled'],
     },
   },
