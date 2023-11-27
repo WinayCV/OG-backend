@@ -7,7 +7,6 @@ app.use(cors());
 const configDB = require('../config/db');
 configDB();
 const socketIo = require('socket.io');
-const {createServer} = require('http');
 const http = require('http');
 const server = http.createServer(app);
 const io = socketIo(server, {

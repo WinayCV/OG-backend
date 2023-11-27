@@ -54,3 +54,24 @@
 //     }, diff1);
 //   };
 // };
+
+const createdOrders = await Promise.all(
+  orderDetails.map(async (orderDetail) => {
+    const addressInfo = await Address.findOne({
+      user: orderDetail.user,
+    });
+    const order = new Order(orderDetail);
+    order.address = addressInfo;
+    order.buyer = orderDetail.user;
+    order.payment = orderDetail.amount;
+    //   const artwork = await Artwork.findByIdAndUpdate(
+    //     {
+    //       _id: orderDetail.artwork,
+    //     },
+    //     {status: 'sold'},
+    //     {new: true, runValidators: true}
+    //   );
+    //   return await order.save();
+    return order;
+  })
+);
