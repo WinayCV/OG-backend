@@ -169,12 +169,7 @@ app.put('/og/payment/:id', authenticateUser, paymentCltr.update);
 app.delete('/og/payment/:id', authenticateUser, paymentCltr.delete);
 // oders
 
-app.post(
-  '/og/order',
-  authenticateUser,
-  checkSchema(orderValidationSchema),
-  orderCltr.create
-);
+app.post('/og/order', authenticateUser, orderCltr.create);
 //Connection to server
 server.listen(port, () => {
   console.log('server running at ', port);

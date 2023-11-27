@@ -65,7 +65,9 @@ artworkCltr.create = async (req, res) => {
 
 artworkCltr.all = async (req, res) => {
   try {
-    const artwork = await Artwork.find({status: 'active'});
+    const artwork = await Artwork.find({status: 'active'}).populate(
+      'auction'
+    );
     res.json(artwork);
   } catch (error) {
     res.status(500).json({error});
