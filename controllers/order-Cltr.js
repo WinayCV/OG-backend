@@ -35,14 +35,14 @@ orderCltr.create = async (req, res) => {
       order.buyer = highestBid.user;
       order.artwork = highestBid.artwork;
       order.payment = highestBid.amount;
-      // const artwork = await Artwork.findByIdAndUpdate(
-      //   {
-      //     _id: highestBid.artwork,
-      //   },
-      //   {status: 'sold'},
-      //   {new: true, runValidators: true}
-      // );
-      // await order.save();
+      const artwork = await Artwork.findByIdAndUpdate(
+        {
+          _id: highestBid.artwork,
+        },
+        {status: 'sold'},
+        {new: true, runValidators: true}
+      );
+      await order.save();
       res.json({msg: 'Order created', order});
     }
   } catch (error) {

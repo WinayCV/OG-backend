@@ -151,6 +151,8 @@ auctionCltr.getBid = async (req, res) => {
 //to get all auction
 auctionCltr.active = async (req, res) => {
   const auctionType = req.query.type;
+  const search = req.query.search;
+
   try {
     const artworks = [];
     const auctions = await Auction.find({
@@ -171,13 +173,23 @@ auctionCltr.active = async (req, res) => {
         end: result.auctionEnd,
       };
     });
-
+    // sending based on type of auction
     if (auctionType) {
       const newOutput = output.filter((ele) => {
         return ele.type == auctionType;
       });
       return res.json(newOutput);
     }
+    // sending response based on serach
+    if (search) {
+      const newOutput = output.filter((ele) => {
+        return ele?.searchTag.some((tag) =>
+          tag?.name.includes(search)
+        );
+      });
+      return res.json(newOutput);
+    }
+
     res.json(output);
   } catch (error) {
     res.status(500).json({error});
