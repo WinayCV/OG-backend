@@ -120,6 +120,7 @@ app.post(
   auctionCltr.create
 );
 app.get('/og/auction/active', auctionCltr.active);
+app.get('/og/auction/exhibition', auctionCltr.exhibition);
 app.get(
   '/og/myauction',
   authenticateUser,

@@ -173,9 +173,11 @@ auctionCltr.active = async (req, res) => {
         end: result.auctionEnd,
       };
     });
+
     // sending based on type of auction
     if (auctionType) {
       const newOutput = output.filter((ele) => {
+        console.log(ele);
         return ele.type == auctionType;
       });
       return res.json(newOutput);
@@ -187,8 +189,46 @@ auctionCltr.active = async (req, res) => {
           tag?.name.includes(search)
         );
       });
+
       return res.json(newOutput);
     }
+
+    res.json(output);
+  } catch (error) {
+    res.status(500).json({error});
+  }
+};
+auctionCltr.exhibition = async (req, res) => {
+  const auctionType = req.query.type;
+  const search = req.query.search;
+  const page = req.query.page;
+  const sort = req.query.sort;
+  const limit = 6 + parseInt(page);
+
+  try {
+    const artworks = [];
+    const auctions = await Auction.find({
+      auctionEnd: {$gte: new Date()},
+    })
+      .sort({createdAt: sort})
+      .populate('artworks');
+    const artwork = await auctions.map((auction) => {
+      return auction.artworks;
+    });
+    const newArray = artwork.flat();
+    const output = newArray
+      .map((ele) => {
+        const result = auctions.find((auction) => {
+          return auction._id.equals(ele.auction);
+        });
+        return {
+          ...ele._doc,
+          type: result.auctionType,
+          start: result.auctionStart,
+          end: result.auctionEnd,
+        };
+      })
+      .slice(page, limit);
 
     res.json(output);
   } catch (error) {
