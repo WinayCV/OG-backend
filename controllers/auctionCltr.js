@@ -177,7 +177,6 @@ auctionCltr.active = async (req, res) => {
     // sending based on type of auction
     if (auctionType) {
       const newOutput = output.filter((ele) => {
-        console.log(ele);
         return ele.type == auctionType;
       });
       return res.json(newOutput);

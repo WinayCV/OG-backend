@@ -10,7 +10,7 @@ module.exports = function (io) {
     let token = socket.handshake.headers['my-custom-header'];
     token = token.split(' ')[1];
     user = jwt.verify(token, process.env.JWT_SECRET);
-
+    let credictedUser = {};
     socket.on('join_auction', (data) => {
       console.log('User connected to room', data);
       socket.join(data);
@@ -18,7 +18,9 @@ module.exports = function (io) {
       socket.on('send_bid', async (data) => {
         try {
           const artwork = await Artwork.findById(data.artworkId);
-          if (artwork.currentBidAmount >= parseInt(data.bid.amount)) {
+          if (
+            artwork?.currentBidAmount >= parseInt(data.bid.amount)
+          ) {
             socket.emit('error', {
               msg: 'Bid amount is less than current bid, please verify your bid amount',
             });
@@ -69,6 +71,7 @@ module.exports = function (io) {
                 });
                 const secondLastBid =
                   bids.length >= 2 ? bids[bids.length - 2] : null;
+
                 if (secondLastBid) {
                   const refundAmount = secondLastBid.amount;
                   const refundUser = secondLastBid.user;
