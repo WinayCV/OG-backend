@@ -76,7 +76,7 @@ userCltr.verify = async (req, res) => {
   }
   try {
     const user = await User.findByIdAndUpdate(id, {isVerified: true});
-    res.redirect('http://localhost:5173/bid');
+    res.redirect('og-frontend-six.vercel.app/bid');
     // res.json({ msg: "verification confirmed" });
   } catch (error) {
     res.status(500).json({error});
