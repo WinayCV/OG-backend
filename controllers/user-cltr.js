@@ -55,7 +55,7 @@ userCltr.register = async (req, res) => {
       to: `${user.email}`, // list of receivers
       subject: 'Verification Email', // Subject line
       text: 'Hello! Welcome to our website.', // plain text body
-      html: `<a href='og-frontend-six.vercel.app/og/verifyEmail/${token}'>Click here to verify your email.</a>`,
+      html: `<a href='https://onlinegallery-be.onrender.com/og/verifyEmail/${token}'>Click here to verify your email.</a>`,
     });
     res.json({
       msg: 'Registraction Sucessful, to activate your account please check your mail and click on verification link.',
@@ -76,7 +76,6 @@ userCltr.verify = async (req, res) => {
   }
   try {
     const user = await User.findByIdAndUpdate(id, {isVerified: true});
-
     res.redirect('https://og-frontend-six.vercel.app');
     // res.json({ msg: "verification confirmed" });
   } catch (error) {
