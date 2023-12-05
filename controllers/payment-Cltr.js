@@ -30,10 +30,8 @@ paymentCltr.create = async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url:
-        'https://og-frontend-six.vercel.app/profile?status=success',
-      cancel_url:
-        'https://og-frontend-six.vercel.app/profile?status=failed',
+      success_url: 'https://og-frontend-six.vercel.app/profile',
+      cancel_url: 'https://og-frontend-six.vercel.app/profile',
     });
 
     const payment = new Payment();
