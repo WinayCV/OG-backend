@@ -172,8 +172,8 @@ userCltr.edit = async (req, res) => {
   }
   const body = _.pick(req.body, [
     'firstName',
-    'lastName',
-    'email',
+    // 'lastName',
+    // 'email',
     'mobileNum',
   ]);
   try {
@@ -181,7 +181,17 @@ userCltr.edit = async (req, res) => {
       new: true,
       runValidators: true,
     });
-    res.json(user);
+    res.json({
+      user: _.pick(user, [
+        'firstName',
+        'lastName',
+        'email',
+        'mobileNum',
+        'credit',
+        'role',
+      ]),
+    });
+    // res.json(body);
   } catch (error) {
     res.status(500).json({error});
   }
